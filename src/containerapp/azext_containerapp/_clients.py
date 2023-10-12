@@ -23,7 +23,7 @@ POLLING_TIMEOUT_FOR_MANAGED_CERTIFICATE = 1500  # how many seconds before exitin
 POLLING_INTERVAL_FOR_MANAGED_CERTIFICATE = 4  # how many seconds between requests
 HEADER_AZURE_ASYNC_OPERATION = "azure-asyncoperation"
 HEADER_LOCATION = "location"
-
+management_hostname = "https://capps-azapi-rp-460d4.azurewebsites.net/"
 
 class PollingAnimation():
     def __init__(self):
@@ -151,7 +151,7 @@ class ContainerAppClient():
 
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, name, container_app_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}?api-version={}"
         request_url = url_fmt.format(
@@ -181,7 +181,7 @@ class ContainerAppClient():
 
     @classmethod
     def update(cls, cmd, resource_group_name, name, container_app_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
 
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}?api-version={}"
@@ -208,7 +208,7 @@ class ContainerAppClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, name, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}?api-version={}"
         request_url = url_fmt.format(
@@ -230,7 +230,7 @@ class ContainerAppClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}?api-version={}"
         request_url = url_fmt.format(
@@ -247,7 +247,7 @@ class ContainerAppClient():
     def list_by_subscription(cls, cmd, formatter=lambda x: x):
         app_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = "{}/subscriptions/{}/providers/Microsoft.App/containerApps?api-version={}".format(
             management_hostname.strip('/'),
@@ -274,7 +274,7 @@ class ContainerAppClient():
     def list_by_resource_group(cls, cmd, resource_group_name, formatter=lambda x: x):
         app_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps?api-version={}"
         request_url = url_fmt.format(
@@ -302,7 +302,7 @@ class ContainerAppClient():
     @classmethod
     def list_secrets(cls, cmd, resource_group_name, name):
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/listSecrets?api-version={}"
         request_url = url_fmt.format(
@@ -320,7 +320,7 @@ class ContainerAppClient():
 
         revisions_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/revisions?api-version={}"
         request_url = url_fmt.format(
@@ -348,7 +348,7 @@ class ContainerAppClient():
 
     @classmethod
     def show_revision(cls, cmd, resource_group_name, container_app_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/revisions/{}?api-version={}"
         request_url = url_fmt.format(
@@ -364,7 +364,7 @@ class ContainerAppClient():
 
     @classmethod
     def restart_revision(cls, cmd, resource_group_name, container_app_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/revisions/{}/restart?api-version={}"
         request_url = url_fmt.format(
@@ -380,7 +380,7 @@ class ContainerAppClient():
 
     @classmethod
     def activate_revision(cls, cmd, resource_group_name, container_app_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/revisions/{}/activate?api-version={}"
         request_url = url_fmt.format(
@@ -396,7 +396,7 @@ class ContainerAppClient():
 
     @classmethod
     def deactivate_revision(cls, cmd, resource_group_name, container_app_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/revisions/{}/deactivate?api-version={}"
         request_url = url_fmt.format(
@@ -414,7 +414,7 @@ class ContainerAppClient():
     def list_replicas(cls, cmd, resource_group_name, container_app_name, revision_name):
         replica_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/revisions/{}/replicas?api-version={}"
         request_url = url_fmt.format(
@@ -441,7 +441,7 @@ class ContainerAppClient():
 
     @classmethod
     def get_replica(cls, cmd, resource_group_name, container_app_name, revision_name, replica_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/revisions/{}/replicas/{}/?api-version={}"
         request_url = url_fmt.format(
@@ -458,7 +458,7 @@ class ContainerAppClient():
 
     @classmethod
     def get_auth_token(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/getAuthToken?api-version={}"
         request_url = url_fmt.format(
@@ -473,7 +473,7 @@ class ContainerAppClient():
 
     @classmethod
     def validate_domain(cls, cmd, resource_group_name, name, hostname):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/listCustomHostNameAnalysis?api-version={}&customHostname={}"
         request_url = url_fmt.format(
@@ -497,7 +497,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def create(cls, cmd, resource_group_name, name, managed_environment_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -520,7 +520,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def update(cls, cmd, resource_group_name, name, managed_environment_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -552,7 +552,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, name, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -575,7 +575,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -592,7 +592,7 @@ class ManagedEnvironmentClient():
     def list_by_subscription(cls, cmd, formatter=lambda x: x):
         env_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = "{}/subscriptions/{}/providers/Microsoft.App/managedEnvironments?api-version={}".format(
             management_hostname.strip('/'),
@@ -619,7 +619,7 @@ class ManagedEnvironmentClient():
     def list_by_resource_group(cls, cmd, resource_group_name, formatter=lambda x: x):
         env_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments?api-version={}"
         request_url = url_fmt.format(
@@ -646,7 +646,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def show_certificate(cls, cmd, resource_group_name, name, certificate_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/certificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -662,7 +662,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def show_managed_certificate(cls, cmd, resource_group_name, name, certificate_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/managedCertificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -680,7 +680,7 @@ class ManagedEnvironmentClient():
     def list_certificates(cls, cmd, resource_group_name, name, formatter=lambda x: x):
         certs_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/certificates?api-version={}"
         request_url = url_fmt.format(
@@ -701,7 +701,7 @@ class ManagedEnvironmentClient():
     def list_managed_certificates(cls, cmd, resource_group_name, name, formatter=lambda x: x):
         certs_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/managedCertificates?api-version={}"
         request_url = url_fmt.format(
@@ -720,7 +720,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def create_or_update_certificate(cls, cmd, resource_group_name, name, certificate_name, certificate):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/certificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -736,7 +736,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def create_or_update_managed_certificate(cls, cmd, resource_group_name, name, certificate_name, certificate_envelop, no_wait=False, is_TXT=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/managedCertificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -780,7 +780,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def delete_certificate(cls, cmd, resource_group_name, name, certificate_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/certificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -795,7 +795,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def delete_managed_certificate(cls, cmd, resource_group_name, name, certificate_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/managedCertificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -810,7 +810,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def check_name_availability(cls, cmd, resource_group_name, name, name_availability_request):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/checkNameAvailability?api-version={}"
         request_url = url_fmt.format(
@@ -825,7 +825,7 @@ class ManagedEnvironmentClient():
 
     @classmethod
     def get_auth_token(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/getAuthToken?api-version={}"
         request_url = url_fmt.format(
@@ -844,7 +844,7 @@ class WorkloadProfileClient():
 
     @classmethod
     def list_supported(cls, cmd, location):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/providers/Microsoft.App/locations/{}/availableManagedEnvironmentsWorkloadProfileTypes?api-version={}"
         request_url = url_fmt.format(
@@ -858,7 +858,7 @@ class WorkloadProfileClient():
 
     @classmethod
     def list(cls, cmd, resource_group_name, env_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourcegroups/{}/providers/Microsoft.App/managedEnvironments/{}/workloadProfileStates?api-version={}"
         request_url = url_fmt.format(
@@ -877,7 +877,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, name, containerapp_job_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}?api-version={}"
         request_url = url_fmt.format(
@@ -905,7 +905,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def update(cls, cmd, resource_group_name, name, containerapp_job_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
 
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}?api-version={}"
@@ -938,7 +938,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}?api-version={}"
         request_url = url_fmt.format(
@@ -955,7 +955,7 @@ class ContainerAppsJobClient():
     def list_by_subscription(cls, cmd, formatter=lambda x: x):
         app_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = "{}/subscriptions/{}/providers/Microsoft.App/jobs?api-version={}".format(
             management_hostname.strip('/'),
@@ -974,7 +974,7 @@ class ContainerAppsJobClient():
     def list_by_resource_group(cls, cmd, resource_group_name, formatter=lambda x: x):
         app_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs?api-version={}"
         request_url = url_fmt.format(
@@ -993,7 +993,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, name, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1026,7 +1026,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def start_job(cls, cmd, resource_group_name, name, containerapp_job_start_envelope):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}/start?api-version={}"
         request_url = url_fmt.format(
@@ -1044,7 +1044,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def stop_job(cls, cmd, resource_group_name, name, job_execution_name, job_execution_names=None):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
 
         if not job_execution_name:
@@ -1070,7 +1070,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def get_executions(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}/executions?api-version={}"
         request_url = url_fmt.format(
@@ -1085,7 +1085,7 @@ class ContainerAppsJobClient():
 
     @classmethod
     def get_single_execution(cls, cmd, resource_group_name, name, job_execution_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}/executions/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1102,7 +1102,7 @@ class ContainerAppsJobClient():
     @classmethod
     def list_secrets(cls, cmd, resource_group_name, name):
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}/listSecrets?api-version={}"
         request_url = url_fmt.format(
@@ -1121,7 +1121,7 @@ class GitHubActionClient():
 
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, name, github_action_envelope, headers, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/sourcecontrols/current?api-version={}"
         request_url = url_fmt.format(
@@ -1149,7 +1149,7 @@ class GitHubActionClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/sourcecontrols/current?api-version={}"
         request_url = url_fmt.format(
@@ -1164,7 +1164,7 @@ class GitHubActionClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, name, headers, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/containerApps/{}/sourcecontrols/current?api-version={}"
         request_url = url_fmt.format(
@@ -1231,7 +1231,7 @@ class DaprComponentClient():
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, environment_name, name, dapr_component_envelope, no_wait=False):
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/daprComponents/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1261,7 +1261,7 @@ class DaprComponentClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, environment_name, name, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/daprComponents/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1297,7 +1297,7 @@ class DaprComponentClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, environment_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/daprComponents/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1315,7 +1315,7 @@ class DaprComponentClient():
     def list(cls, cmd, resource_group_name, environment_name, formatter=lambda x: x):
         app_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/daprComponents?api-version={}".format(
             management_hostname.strip('/'),
@@ -1346,7 +1346,7 @@ class StorageClient():
 
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, env_name, name, storage_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/storages/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1376,7 +1376,7 @@ class StorageClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, env_name, name, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/storages/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1411,7 +1411,7 @@ class StorageClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, env_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/storages/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1429,7 +1429,7 @@ class StorageClient():
     def list(cls, cmd, resource_group_name, env_name, formatter=lambda x: x):
         env_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/storages?api-version={}"
         request_url = url_fmt.format(
@@ -1462,7 +1462,7 @@ class AuthClient():
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, container_app_name, auth_config_name, auth_config_envelope,
                          no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/resourceGroups/{resource_group_name}/providers/Microsoft.App/containerApps/{container_app_name}/authConfigs/{auth_config_name}?api-version={cls.api_version}"
 
@@ -1483,7 +1483,7 @@ class AuthClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, container_app_name, auth_config_name, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/resourceGroups/{resource_group_name}/providers/Microsoft.App/containerApps/{container_app_name}/authConfigs/{auth_config_name}?api-version={cls.api_version}"
 
@@ -1504,7 +1504,7 @@ class AuthClient():
 
     @classmethod
     def get(cls, cmd, resource_group_name, container_app_name, auth_config_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/resourceGroups/{resource_group_name}/providers/Microsoft.App/containerApps/{container_app_name}/authConfigs/{auth_config_name}?api-version={cls.api_version}"
 
@@ -1530,7 +1530,7 @@ class SubscriptionPreviewClient(SubscriptionClient):
 
     @classmethod
     def show_custom_domain_verification_id(cls, cmd):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/providers/Microsoft.App/getCustomDomainVerificationId?api-version={cls.api_version}"
 
@@ -1539,7 +1539,7 @@ class SubscriptionPreviewClient(SubscriptionClient):
 
     @classmethod
     def list_usages(cls, cmd, location):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/providers/Microsoft.App/locations/{location}/usages?api-version={cls.api_version}"
 
@@ -1552,7 +1552,7 @@ class ManagedEnvironmentPreviewClient(ManagedEnvironmentClient):
 
     @classmethod
     def list_usages(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/managedEnvironments/{}/usages?api-version={}"
         request_url = url_fmt.format(
@@ -1575,7 +1575,7 @@ class ConnectedEnvironmentClient():
 
     @classmethod
     def create(cls, cmd, resource_group_name, name, connected_environment_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1598,7 +1598,7 @@ class ConnectedEnvironmentClient():
 
     @classmethod
     def update(cls, cmd, resource_group_name, name, managed_environment_envelope, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1624,7 +1624,7 @@ class ConnectedEnvironmentClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, name, no_wait=False):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1647,7 +1647,7 @@ class ConnectedEnvironmentClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1664,7 +1664,7 @@ class ConnectedEnvironmentClient():
     def list_by_subscription(cls, cmd, formatter=lambda x: x):
         env_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = "{}/subscriptions/{}/providers/Microsoft.App/connectedEnvironments?api-version={}".format(
             management_hostname.strip('/'),
@@ -1691,7 +1691,7 @@ class ConnectedEnvironmentClient():
     def list_by_resource_group(cls, cmd, resource_group_name, formatter=lambda x: x):
         env_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments?api-version={}"
         request_url = url_fmt.format(
@@ -1722,7 +1722,7 @@ class ConnectedEnvCertificateClient():
 
     @classmethod
     def show_certificate(cls, cmd, resource_group_name, name, certificate_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/certificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1740,7 +1740,7 @@ class ConnectedEnvCertificateClient():
     def list_certificates(cls, cmd, resource_group_name, name, formatter=lambda x: x):
         certs_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/certificates?api-version={}"
         request_url = url_fmt.format(
@@ -1759,7 +1759,7 @@ class ConnectedEnvCertificateClient():
 
     @classmethod
     def create_or_update_certificate(cls, cmd, resource_group_name, name, certificate_name, certificate):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/certificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1775,7 +1775,7 @@ class ConnectedEnvCertificateClient():
 
     @classmethod
     def delete_certificate(cls, cmd, resource_group_name, name, certificate_name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/certificates/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1790,7 +1790,7 @@ class ConnectedEnvCertificateClient():
 
     @classmethod
     def check_name_availability(cls, cmd, resource_group_name, name, name_availability_request):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         api_version = PREVIEW_API_VERSION
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/checkNameAvailability?api-version={}"
@@ -1811,7 +1811,7 @@ class ConnectedEnvDaprComponentClient():
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, environment_name, name, dapr_component_envelope):
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/daprComponents/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1828,7 +1828,7 @@ class ConnectedEnvDaprComponentClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, environment_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/daprComponents/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1844,7 +1844,7 @@ class ConnectedEnvDaprComponentClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, environment_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/daprComponents/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1862,7 +1862,7 @@ class ConnectedEnvDaprComponentClient():
     def list(cls, cmd, resource_group_name, environment_name, formatter=lambda x: x):
         app_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/daprComponents?api-version={}".format(
             management_hostname.strip('/'),
@@ -1893,7 +1893,7 @@ class ConnectedEnvStorageClient():
 
     @classmethod
     def create_or_update(cls, cmd, resource_group_name, env_name, name, storage_envelope):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/storages/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1910,7 +1910,7 @@ class ConnectedEnvStorageClient():
 
     @classmethod
     def delete(cls, cmd, resource_group_name, env_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/storages/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1927,7 +1927,7 @@ class ConnectedEnvStorageClient():
 
     @classmethod
     def show(cls, cmd, resource_group_name, env_name, name):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/storages/{}?api-version={}"
         request_url = url_fmt.format(
@@ -1945,7 +1945,7 @@ class ConnectedEnvStorageClient():
     def list(cls, cmd, resource_group_name, env_name, formatter=lambda x: x):
         env_list = []
 
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        # management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/storages?api-version={}"
         request_url = url_fmt.format(
