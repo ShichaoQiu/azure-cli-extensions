@@ -187,6 +187,9 @@ def create_deserializer():
 def bind_java_component(cmd, name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
     return update_containerapp(cmd, name, resource_group_name, service_bindings=component_name)
 
+def unbind_java_component(cmd, name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
+    return update_containerapp(cmd, name, resource_group_name, unbind_service_bindings=component_name)
+
 def create_spring_boot_admin_service(cmd, service_name, environment_name, resource_group_name, no_wait=False,
                          disable_warnings=True):
     return DevServiceUtils.create_service(cmd, service_name, environment_name, resource_group_name, no_wait,

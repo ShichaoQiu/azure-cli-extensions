@@ -92,7 +92,7 @@ def load_command_table(self, _):
 
     with self.command_group('containerapp java-component') as g:
         g.custom_command('bind', 'bind_java_component', supports_no_wait=True)
-        # g.custom_command('delete', 'delete_redis_service', confirmation=True, supports_no_wait=True)
+        g.custom_command('unbind', 'unbind_java_component', supports_no_wait=True)
 
     with self.command_group('containerapp env java-component spring-boot-admin') as g:
         g.custom_command('create', 'create_spring_boot_admin_service', supports_no_wait=True)
