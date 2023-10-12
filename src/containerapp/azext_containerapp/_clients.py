@@ -49,13 +49,13 @@ def poll(cmd, request_url, poll_if_status):  # pylint: disable=inconsistent-retu
         animation = PollingAnimation()
 
         animation.tick()
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
 
         while r.status_code in [200, 201] and start < end:
             time.sleep(POLLING_SECONDS)
             animation.tick()
 
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             r2 = r.json()
 
             if "properties" not in r2 or "provisioningState" not in r2["properties"] or r2["properties"]["provisioningState"].lower() in ["succeeded", "failed", "canceled"]:
@@ -85,12 +85,12 @@ def poll_status(cmd, request_url):  # pylint: disable=inconsistent-return-statem
     animation = PollingAnimation()
 
     animation.tick()
-    r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+    r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
 
     while r.status_code in [200] and start < end:
         time.sleep(_extract_delay(r))
         animation.tick()
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         response_body = json.loads(r.text)
         status = safe_get(response_body, "status")
         if not status:
@@ -118,12 +118,12 @@ def poll_results(cmd, request_url):  # pylint: disable=inconsistent-return-state
     animation = PollingAnimation()
 
     animation.tick()
-    r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+    r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
 
     while r.status_code in [202] and start < end:
         time.sleep(_extract_delay(r))
         animation.tick()
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         start = time.time()
 
     animation.flush()
@@ -161,7 +161,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(container_app_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(container_app_envelope))
 
         if no_wait:
             return r.json()
@@ -175,7 +175,7 @@ class ContainerAppClient():
                 resource_group_name,
                 name,
                 cls.api_version)
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
 
         return r.json()
 
@@ -192,7 +192,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, body=json.dumps(container_app_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, skip_authorization_header=True, body=json.dumps(container_app_envelope))
 
         if no_wait:
             return
@@ -218,7 +218,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -240,7 +240,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -254,7 +254,7 @@ class ContainerAppClient():
             sub_id,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for app in j["value"]:
             formatted = formatter(app)
@@ -262,7 +262,7 @@ class ContainerAppClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for app in j["value"]:
                 formatted = formatter(app)
@@ -283,7 +283,7 @@ class ContainerAppClient():
             resource_group_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for app in j["value"]:
             formatted = formatter(app)
@@ -291,7 +291,7 @@ class ContainerAppClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for app in j["value"]:
                 formatted = formatter(app)
@@ -312,7 +312,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True, body=None)
         return r.json()
 
     @classmethod
@@ -330,7 +330,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for app in j["value"]:
             formatted = formatter(app)
@@ -338,7 +338,7 @@ class ContainerAppClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for app in j["value"]:
                 formatted = formatter(app)
@@ -359,7 +359,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -375,7 +375,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -391,7 +391,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -407,7 +407,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -425,14 +425,14 @@ class ContainerAppClient():
             revision_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for replica in j["value"]:
             replica_list.append(replica)
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for replica in j["value"]:
                 replica_list.append(replica)
@@ -453,7 +453,7 @@ class ContainerAppClient():
             replica_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -468,7 +468,7 @@ class ContainerAppClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -484,7 +484,7 @@ class ContainerAppClient():
             cls.api_version,
             hostname)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         return r.json()
 
 
@@ -507,14 +507,14 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(managed_environment_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(managed_environment_envelope))
 
         if no_wait:
             return r.json()
         elif r.status_code == 201:
             operation_url = r.headers.get(HEADER_AZURE_ASYNC_OPERATION)
             poll_status(cmd, operation_url)
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
 
         return r.json()
 
@@ -530,7 +530,7 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, body=json.dumps(managed_environment_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, skip_authorization_header=True, body=json.dumps(managed_environment_envelope))
 
         if no_wait:
             return
@@ -538,7 +538,7 @@ class ManagedEnvironmentClient():
             operation_url = r.headers.get(HEADER_LOCATION)
             if "managedEnvironmentOperationStatuses" in operation_url:
                 poll_status(cmd, operation_url)
-                r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+                r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             elif "managedEnvironmentOperationResults" in operation_url:
                 response = poll_results(cmd, operation_url)
                 if response is None:
@@ -562,7 +562,7 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -585,7 +585,7 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -599,7 +599,7 @@ class ManagedEnvironmentClient():
             sub_id,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for env in j["value"]:
             formatted = formatter(env)
@@ -607,7 +607,7 @@ class ManagedEnvironmentClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for env in j["value"]:
                 formatted = formatter(env)
@@ -628,7 +628,7 @@ class ManagedEnvironmentClient():
             resource_group_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for env in j["value"]:
             formatted = formatter(env)
@@ -636,7 +636,7 @@ class ManagedEnvironmentClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for env in j["value"]:
                 formatted = formatter(env)
@@ -657,7 +657,7 @@ class ManagedEnvironmentClient():
             certificate_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True, body=None)
         return r.json()
 
     @classmethod
@@ -673,7 +673,7 @@ class ManagedEnvironmentClient():
             certificate_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True, body=None)
         return r.json()
 
     @classmethod
@@ -690,7 +690,7 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True, body=None)
         j = r.json()
         for cert in j["value"]:
             formatted = formatter(cert)
@@ -711,7 +711,7 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True, body=None)
         j = r.json()
         for cert in j["value"]:
             formatted = formatter(cert)
@@ -731,7 +731,7 @@ class ManagedEnvironmentClient():
             certificate_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(certificate))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(certificate))
         return r.json()
 
     @classmethod
@@ -746,7 +746,7 @@ class ManagedEnvironmentClient():
             name,
             certificate_name,
             cls.api_version)
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(certificate_envelop))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(certificate_envelop))
 
         if no_wait and not is_TXT:
             return r.json()
@@ -756,12 +756,12 @@ class ManagedEnvironmentClient():
                 end = time.time() + POLLING_TIMEOUT_FOR_MANAGED_CERTIFICATE
                 animation = PollingAnimation()
                 animation.tick()
-                r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+                r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
                 message_logged = False
                 while r.status_code in [200, 201] and start < end:
                     time.sleep(POLLING_INTERVAL_FOR_MANAGED_CERTIFICATE)
                     animation.tick()
-                    r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+                    r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
                     r2 = r.json()
                     if is_TXT and not message_logged and "properties" in r2 and "validationToken" in r2["properties"]:
                         logger.warning('\nPlease copy the token below for TXT record and enter it with your domain provider:\n%s\n', r2["properties"]["validationToken"])
@@ -791,7 +791,7 @@ class ManagedEnvironmentClient():
             certificate_name,
             cls.api_version)
 
-        return send_raw_request(cmd.cli_ctx, "DELETE", request_url, body=None)
+        return send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True, body=None)
 
     @classmethod
     def delete_managed_certificate(cls, cmd, resource_group_name, name, certificate_name):
@@ -806,7 +806,7 @@ class ManagedEnvironmentClient():
             certificate_name,
             cls.api_version)
 
-        return send_raw_request(cmd.cli_ctx, "DELETE", request_url, body=None)
+        return send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True, body=None)
 
     @classmethod
     def check_name_availability(cls, cmd, resource_group_name, name, name_availability_request):
@@ -820,7 +820,7 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url, body=json.dumps(name_availability_request))
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True, body=json.dumps(name_availability_request))
         return r.json()
 
     @classmethod
@@ -835,7 +835,7 @@ class ManagedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         return r.json()
 
 
@@ -853,7 +853,7 @@ class WorkloadProfileClient():
             location,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json().get("value")
 
     @classmethod
@@ -868,7 +868,7 @@ class WorkloadProfileClient():
             env_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json().get("value")
 
 
@@ -887,7 +887,7 @@ class ContainerAppsJobClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(containerapp_job_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(containerapp_job_envelope))
 
         if no_wait:
             return r.json()
@@ -916,7 +916,7 @@ class ContainerAppsJobClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, body=json.dumps(containerapp_job_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, skip_authorization_header=True, body=json.dumps(containerapp_job_envelope))
 
         if no_wait:
             return r.json()
@@ -948,7 +948,7 @@ class ContainerAppsJobClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -962,7 +962,7 @@ class ContainerAppsJobClient():
             sub_id,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for app in j["value"]:
             formatted = formatter(app)
@@ -983,7 +983,7 @@ class ContainerAppsJobClient():
             resource_group_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for app in j["value"]:
             formatted = formatter(app)
@@ -1003,7 +1003,7 @@ class ContainerAppsJobClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -1036,9 +1036,9 @@ class ContainerAppsJobClient():
             name,
             cls.api_version)
         if containerapp_job_start_envelope is None:
-            r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+            r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         else:
-            r = send_raw_request(cmd.cli_ctx, "POST", request_url, body=json.dumps(containerapp_job_start_envelope))
+            r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True, body=json.dumps(containerapp_job_start_envelope))
 
         return r.json()
 
@@ -1065,7 +1065,7 @@ class ContainerAppsJobClient():
                 job_execution_name,
                 cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url, body=json.dumps(job_execution_names))
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True, body=json.dumps(job_execution_names))
         return r.json()
 
     @classmethod
@@ -1080,7 +1080,7 @@ class ContainerAppsJobClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1096,7 +1096,7 @@ class ContainerAppsJobClient():
             job_execution_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1112,7 +1112,7 @@ class ContainerAppsJobClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True, body=None)
         return r.json()
 
 
@@ -1131,7 +1131,7 @@ class GitHubActionClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(github_action_envelope), headers=headers)
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(github_action_envelope), headers=headers)
 
         if no_wait:
             return r.json()
@@ -1159,7 +1159,7 @@ class GitHubActionClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1174,7 +1174,7 @@ class GitHubActionClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, headers=headers)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True, headers=headers)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -1211,7 +1211,7 @@ class GitHubActionClient():
         import re
         try:
             headers = ["Authorization=Bearer {}".format(token)]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url, headers=headers)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True, headers=headers)
             if r.status_code == 200:
                 r_json = r.json()
 
@@ -1242,7 +1242,7 @@ class DaprComponentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(dapr_component_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(dapr_component_envelope))
 
         if no_wait:
             return r.json()
@@ -1272,7 +1272,7 @@ class DaprComponentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -1308,7 +1308,7 @@ class DaprComponentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1324,7 +1324,7 @@ class DaprComponentClient():
             environment_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for app in j["value"]:
             formatted = formatter(app)
@@ -1332,7 +1332,7 @@ class DaprComponentClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for app in j["value"]:
                 formatted = formatter(app)
@@ -1357,7 +1357,7 @@ class StorageClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(storage_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(storage_envelope))
 
         if no_wait:
             return r.json()
@@ -1387,7 +1387,7 @@ class StorageClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -1422,7 +1422,7 @@ class StorageClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1439,7 +1439,7 @@ class StorageClient():
             env_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for env in j["value"]:
             formatted = formatter(env)
@@ -1447,7 +1447,7 @@ class StorageClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for env in j["value"]:
                 formatted = formatter(env)
@@ -1471,7 +1471,7 @@ class AuthClient():
             auth_config_envelope = {}
             auth_config_envelope["properties"] = temp_env
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(auth_config_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(auth_config_envelope))
 
         if no_wait:
             return r.json()
@@ -1487,7 +1487,7 @@ class AuthClient():
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/resourceGroups/{resource_group_name}/providers/Microsoft.App/containerApps/{container_app_name}/authConfigs/{auth_config_name}?api-version={cls.api_version}"
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -1508,7 +1508,7 @@ class AuthClient():
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/resourceGroups/{resource_group_name}/providers/Microsoft.App/containerApps/{container_app_name}/authConfigs/{auth_config_name}?api-version={cls.api_version}"
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
 
@@ -1534,7 +1534,7 @@ class SubscriptionPreviewClient(SubscriptionClient):
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/providers/Microsoft.App/getCustomDomainVerificationId?api-version={cls.api_version}"
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1543,7 +1543,7 @@ class SubscriptionPreviewClient(SubscriptionClient):
         sub_id = get_subscription_id(cmd.cli_ctx)
         request_url = f"{management_hostname}subscriptions/{sub_id}/providers/Microsoft.App/locations/{location}/usages?api-version={cls.api_version}"
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
 
@@ -1562,7 +1562,7 @@ class ManagedEnvironmentPreviewClient(ManagedEnvironmentClient):
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
 
@@ -1585,14 +1585,14 @@ class ConnectedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(connected_environment_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(connected_environment_envelope))
 
         if no_wait:
             return r.json()
         elif r.status_code == 201:
             operation_url = r.headers.get(HEADER_AZURE_ASYNC_OPERATION)
             poll_status(cmd, operation_url)
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
 
         return r.json()
 
@@ -1608,7 +1608,7 @@ class ConnectedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, body=json.dumps(managed_environment_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PATCH", request_url, skip_authorization_header=True, body=json.dumps(managed_environment_envelope))
 
         if no_wait:
             return
@@ -1634,7 +1634,7 @@ class ConnectedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         if no_wait:
             return  # API doesn't return JSON (it returns no content)
@@ -1657,7 +1657,7 @@ class ConnectedEnvironmentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1671,7 +1671,7 @@ class ConnectedEnvironmentClient():
             sub_id,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for env in j["value"]:
             formatted = formatter(env)
@@ -1679,7 +1679,7 @@ class ConnectedEnvironmentClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for env in j["value"]:
                 formatted = formatter(env)
@@ -1700,7 +1700,7 @@ class ConnectedEnvironmentClient():
             resource_group_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for env in j["value"]:
             formatted = formatter(env)
@@ -1708,7 +1708,7 @@ class ConnectedEnvironmentClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for env in j["value"]:
                 formatted = formatter(env)
@@ -1733,7 +1733,7 @@ class ConnectedEnvCertificateClient():
             certificate_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True, body=None)
         return r.json()
 
     @classmethod
@@ -1750,7 +1750,7 @@ class ConnectedEnvCertificateClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url, body=None)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True, body=None)
         j = r.json()
         for cert in j["value"]:
             formatted = formatter(cert)
@@ -1770,7 +1770,7 @@ class ConnectedEnvCertificateClient():
             certificate_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(certificate))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(certificate))
         return r.json()
 
     @classmethod
@@ -1786,7 +1786,7 @@ class ConnectedEnvCertificateClient():
             certificate_name,
             cls.api_version)
 
-        return send_raw_request(cmd.cli_ctx, "DELETE", request_url, body=None)
+        return send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True, body=None)
 
     @classmethod
     def check_name_availability(cls, cmd, resource_group_name, name, name_availability_request):
@@ -1801,7 +1801,7 @@ class ConnectedEnvCertificateClient():
             name,
             api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url, body=json.dumps(name_availability_request))
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url, skip_authorization_header=True, body=json.dumps(name_availability_request))
         return r.json()
 
 
@@ -1822,7 +1822,7 @@ class ConnectedEnvDaprComponentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(dapr_component_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(dapr_component_envelope))
 
         return r.json()
 
@@ -1839,7 +1839,7 @@ class ConnectedEnvDaprComponentClient():
             name,
             cls.api_version)
 
-        send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
         return
 
     @classmethod
@@ -1855,7 +1855,7 @@ class ConnectedEnvDaprComponentClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1871,7 +1871,7 @@ class ConnectedEnvDaprComponentClient():
             environment_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for app in j["value"]:
             formatted = formatter(app)
@@ -1879,7 +1879,7 @@ class ConnectedEnvDaprComponentClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for app in j["value"]:
                 formatted = formatter(app)
@@ -1904,7 +1904,7 @@ class ConnectedEnvStorageClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(storage_envelope))
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, skip_authorization_header=True, body=json.dumps(storage_envelope))
 
         return r.json()
 
@@ -1921,7 +1921,7 @@ class ConnectedEnvStorageClient():
             name,
             cls.api_version)
 
-        send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+        send_raw_request(cmd.cli_ctx, "DELETE", request_url, skip_authorization_header=True)
 
         return
 
@@ -1938,7 +1938,7 @@ class ConnectedEnvStorageClient():
             name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         return r.json()
 
     @classmethod
@@ -1955,7 +1955,7 @@ class ConnectedEnvStorageClient():
             env_name,
             cls.api_version)
 
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
         j = r.json()
         for env in j["value"]:
             formatted = formatter(env)
@@ -1963,7 +1963,7 @@ class ConnectedEnvStorageClient():
 
         while j.get("nextLink") is not None:
             request_url = j["nextLink"]
-            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url, skip_authorization_header=True)
             j = r.json()
             for env in j["value"]:
                 formatted = formatter(env)
