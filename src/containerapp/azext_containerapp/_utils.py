@@ -1961,7 +1961,7 @@ def get_pack_exec_path():
         if not os.path.exists(bin_folder):
             os.makedirs(bin_folder)
 
-        pack_cli_version = "v0.29.0"
+        pack_cli_version = "v0.30.0"
         exec_name = "pack"
         compressed_download_file_name = f"pack-{pack_cli_version}"
         host_os = platform.system()

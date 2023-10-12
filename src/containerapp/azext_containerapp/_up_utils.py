@@ -478,10 +478,11 @@ class ContainerApp(Resource):  # pylint: disable=too-many-instance-attributes
 
         registry_name = self.registry_server.lower()
         image_name = f"{registry_name}/{image_name}"
-        builder_image_name = "mcr.microsoft.com/oryx/builder:builder-dotnet-7.0"
+        builder_image_name = "liyidockid/builder-java-azure:latest"
 
         # Ensure that the builder is trusted
         command = [pack_exec_path, 'config', 'default-builder', builder_image_name]
+
         logger.debug(f"Calling '{' '.join(command)}'")
         try:
             with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
@@ -492,13 +493,20 @@ class ContainerApp(Resource):  # pylint: disable=too-many-instance-attributes
         except Exception as ex:
             raise ValidationError(f"Unable to run 'pack config' command to set default builder: {ex}") from ex
 
+        command = [pack_exec_path, 'config', 'experimental', 'true']
+
+        logger.debug(f"Calling '{' '.join(command)}'")
+        try:
+            with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+                _, stderr = process.communicate()
+                if process.returncode != 0:
+                    raise CLIError(f"Error thrown when running 'pack config': {stderr.decode('utf-8')}")
+                logger.debug(f"Successfully enabled experiment feature.")
+        except Exception as ex:
+            raise ValidationError(f"Unable to run 'pack config' command to enable experiment feature: {ex}") from ex
+
         # Run 'pack build' to produce a runnable application image for the Container App
         command = [pack_exec_path, 'build', image_name, '--builder', builder_image_name, '--path', source]
-        buildpack_run_tag = get_latest_buildpack_run_tag("aspnet", "7.0")
-        if buildpack_run_tag is not None:
-            buildpack_run_image = f"mcr.microsoft.com/oryx/builder:{buildpack_run_tag}"
-            logger.debug(f"Determined the run image to use as {buildpack_run_image}.")
-            command.extend(['--run-image', buildpack_run_image])
 
         # If the user specifies a target port, pass it to the buildpack
         if self.target_port:
@@ -602,8 +610,6 @@ class ContainerApp(Resource):  # pylint: disable=too-many-instance-attributes
                 logger.warning("Attempting to build image using buildpacks...")
                 buildpack_image_name_with_tag = image_name_with_tag
                 run_image_tag = get_latest_buildpack_run_tag("aspnet", "7.0")
-                if run_image_tag is not None:
-                    buildpack_image_name_with_tag = f"{image_name}:{run_image_tag}-{tag_now_suffix}"
                 self.build_container_from_source_with_buildpack(buildpack_image_name_with_tag, source)
                 self.image = self.registry_server + "/" + buildpack_image_name_with_tag
                 return
