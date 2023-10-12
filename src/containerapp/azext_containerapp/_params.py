@@ -209,6 +209,7 @@ def load_arguments(self, _):
         c.argument('service_name', options_list=['--name', '-n'], help="The service name.")
         c.argument('environment_name', options_list=['--environment'], help="The environment name.")
         c.argument('resource_group_name', arg_type=resource_group_name_type, id_part=None)
+        c.argument('yaml', type=file_type, help='Path to a .yaml file with the configuration of a java component.')
 
     with self.argument_context('containerapp java-component') as c:
         c.argument('component_name', nargs='*',

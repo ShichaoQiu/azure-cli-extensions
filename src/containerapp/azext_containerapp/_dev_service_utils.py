@@ -15,8 +15,14 @@ from ._utils import register_provider_if_needed, validate_container_app_name, Ap
 class DevServiceUtils:
     @staticmethod
     def create_service(cmd, service_name, environment_name, resource_group_name, no_wait, disable_warnings, image,
-                       service_type, container_name):
+                       service_type, container_name, yaml=None):
         from .custom import create_containerapp
+        from ._decorator_utils import load_yaml_file
+
+        yaml_config_list = None
+        if yaml is not None:
+            yaml_config_dict = load_yaml_file(yaml)
+            yaml_config_list = [f"{key}={value}" for key, value in yaml_config_dict.items()]
 
         register_provider_if_needed(cmd, CONTAINER_APPS_RP)
         validate_container_app_name(service_name, AppType.ContainerApp.name)
@@ -36,7 +42,7 @@ class DevServiceUtils:
         return create_containerapp(cmd=cmd, name=service_name, resource_group_name=resource_group_name,
                                    managed_env=env_info['id'],
                                    image=image, service_type=service_type, container_name=container_name,
-                                   no_wait=no_wait, disable_warnings=disable_warnings)
+                                   no_wait=no_wait, disable_warnings=disable_warnings, env_vars=yaml_config_list)
 
     @staticmethod
     def delete_service(cmd, service_name, resource_group_name, no_wait, service_type):

@@ -102,6 +102,10 @@ def load_command_table(self, _):
         g.custom_command('create', 'create_spring_cloud_eureka_service', supports_no_wait=True)
         # g.custom_command('delete', 'delete_redis_service', confirmation=True, supports_no_wait=True)
 
+    with self.command_group('containerapp env java-component spring-cloud-config') as g:
+        g.custom_command('create', 'create_spring_cloud_config_service', supports_no_wait=True)
+        # g.custom_command('delete', 'delete_redis_service', confirmation=True, supports_no_wait=True)
+
     with self.command_group('containerapp service', is_preview=True) as g:
         g.custom_command('list', 'list_all_services')
 
