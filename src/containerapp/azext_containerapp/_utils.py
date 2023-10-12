@@ -430,51 +430,67 @@ def get_linker_client(cmd):
 
 def process_service(cmd, resource_list, service_name, arg_dict, subscription_id, resource_group_name, name,
                     binding_name, service_connector_def_list, service_bindings_def_list):
+
+    containerapp_def = ContainerAppClient.show(cmd=cmd, resource_group_name=resource_group_name,
+                                               name=service_name)
+    if not containerapp_def:
+        raise ResourceNotFoundError(f"The service '{service_name}' does not exist")
+
+    service_type = safe_get(containerapp_def, "properties", "configuration", "service", "type")
+
+    if service_type is None or service_type not in DEV_SERVICE_LIST:
+        raise ResourceNotFoundError(f"The service '{service_name}' does not exist")
+
+    service_bindings_def_list.append({
+        "serviceId": containerapp_def["id"],
+        "name": binding_name
+    })
+
     # Check if the service exists in the list of dict
-    for service in resource_list:
-        if service["name"] == service_name:
-            if service["type"] == "Microsoft.Cache/Redis":
-                service_connector_def_list.append(
-                    ManagedRedisUtils.build_redis_service_connector_def(subscription_id, resource_group_name,
-                                                                        service_name, arg_dict,
-                                                                        name, binding_name))
-            elif service["type"] == "Microsoft.DocumentDb/databaseAccounts":
-                service_connector_def_list.append(
-                    ManagedCosmosDBUtils.build_cosmosdb_service_connector_def(subscription_id, resource_group_name,
-                                                                              service_name, arg_dict,
-                                                                              name, binding_name))
-            elif service["type"] == "Microsoft.DBforPostgreSQL/flexibleServers":
-                service_connector_def_list.append(
-                    ManagedPostgreSQLFlexibleUtils.build_postgresql_service_connector_def(subscription_id, resource_group_name,
-                                                                                          service_name, arg_dict,
-                                                                                          name, binding_name))
-            elif service["type"] == "Microsoft.DBforMySQL/flexibleServers":
-                service_connector_def_list.append(
-                    ManagedMySQLFlexibleUtils.build_mysql_service_connector_def(subscription_id, resource_group_name,
-                                                                                service_name, arg_dict,
-                                                                                name, binding_name))
-            elif service["type"] == "Microsoft.App/containerApps":
-                containerapp_def = ContainerAppClient.show(cmd=cmd, resource_group_name=resource_group_name,
-                                                           name=service_name)
-
-                if not containerapp_def:
-                    raise ResourceNotFoundError(f"The service '{service_name}' does not exist")
-
-                service_type = safe_get(containerapp_def, "properties", "configuration", "service", "type")
-
-                if service_type is None or service_type not in DEV_SERVICE_LIST:
-                    raise ResourceNotFoundError(f"The service '{service_name}' does not exist")
-
-                service_bindings_def_list.append({
-                    "serviceId": containerapp_def["id"],
-                    "name": binding_name
-                })
-
-            else:
-                raise ValidationError("Service not supported")
-            break
-    else:
-        raise ResourceNotFoundError("Service with the given name does not exist")
+    # for service in resource_list:
+    #     if service["name"] == service_name:
+    #         if service["type"] == "Microsoft.Cache/Redis":
+    #             service_connector_def_list.append(
+    #                 ManagedRedisUtils.build_redis_service_connector_def(subscription_id, resource_group_name,
+    #                                                                     service_name, arg_dict,
+    #                                                                     name, binding_name))
+    #         elif service["type"] == "Microsoft.DocumentDb/databaseAccounts":
+    #             service_connector_def_list.append(
+    #                 ManagedCosmosDBUtils.build_cosmosdb_service_connector_def(subscription_id, resource_group_name,
+    #                                                                           service_name, arg_dict,
+    #                                                                           name, binding_name))
+    #         elif service["type"] == "Microsoft.DBforPostgreSQL/flexibleServers":
+    #             service_connector_def_list.append(
+    #                 ManagedPostgreSQLFlexibleUtils.build_postgresql_service_connector_def(subscription_id, resource_group_name,
+    #                                                                                       service_name, arg_dict,
+    #                                                                                       name, binding_name))
+    #         elif service["type"] == "Microsoft.DBforMySQL/flexibleServers":
+    #             service_connector_def_list.append(
+    #                 ManagedMySQLFlexibleUtils.build_mysql_service_connector_def(subscription_id, resource_group_name,
+    #                                                                             service_name, arg_dict,
+    #                                                                             name, binding_name))
+    #         elif service["type"] == "Microsoft.App/containerApps":
+    #             containerapp_def = ContainerAppClient.show(cmd=cmd, resource_group_name=resource_group_name,
+    #                                                        name=service_name)
+    #
+    #             if not containerapp_def:
+    #                 raise ResourceNotFoundError(f"The service '{service_name}' does not exist")
+    #
+    #             service_type = safe_get(containerapp_def, "properties", "configuration", "service", "type")
+    #
+    #             if service_type is None or service_type not in DEV_SERVICE_LIST:
+    #                 raise ResourceNotFoundError(f"The service '{service_name}' does not exist")
+    #
+    #             service_bindings_def_list.append({
+    #                 "serviceId": containerapp_def["id"],
+    #                 "name": binding_name
+    #             })
+    #
+    #         else:
+    #             raise ValidationError("Service not supported")
+    #         break
+    # else:
+    #     raise ResourceNotFoundError("Service with the given name does not exist")
 
 
 def validate_binding_name(binding_name):

@@ -1515,7 +1515,7 @@ class ContainerAppPreviewUpdateDecorator(ContainerAppUpdateDecorator):
                 while r["properties"]["provisioningState"].lower() == "inprogress":
                     r = self.client.show(self.cmd, self.get_argument_resource_group_name(), self.get_argument_name())
                     time.sleep(1)
-                linker_client.linker.begin_delete(resource_uri=r["id"], linker_name=item).result()
+                # linker_client.linker.begin_delete(resource_uri=r["id"], linker_name=item).result()
 
         # Update managed bindings
         if self.get_argument_service_connectors_def_list() is not None:
@@ -1549,13 +1549,13 @@ class ContainerAppPreviewUpdateDecorator(ContainerAppUpdateDecorator):
                         service_bindings_used_map[update_item["name"]] = True
 
             for update_item in service_bindings_def_list:
-                if service_bindings_used_map[update_item["name"]] is False:
-                    # Check if it doesn't exist in existing service linkers
-                    managed_bindings = linker_client.linker.list(resource_uri=self.containerapp_def["id"])
-                    if managed_bindings:
-                        managed_bindings_list = [item.name for item in managed_bindings]
-                        if update_item["name"] in managed_bindings_list:
-                            raise ValidationError("Binding names across managed and dev services should be unique.")
+                # if service_bindings_used_map[update_item["name"]] is False:
+                #     # Check if it doesn't exist in existing service linkers
+                #     managed_bindings = linker_client.linker.list(resource_uri=self.containerapp_def["id"])
+                #     if managed_bindings:
+                #         managed_bindings_list = [item.name for item in managed_bindings]
+                #         if update_item["name"] in managed_bindings_list:
+                #             raise ValidationError("Binding names across managed and dev services should be unique.")
 
                     self.new_containerapp["properties"]["template"]["serviceBinds"].append(update_item)
 
