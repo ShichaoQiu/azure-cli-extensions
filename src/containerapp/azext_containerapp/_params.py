@@ -134,7 +134,7 @@ def load_arguments(self, _):
 
     # Springboard
     with self.argument_context('containerapp create', arg_group='Service Binding') as c:
-        c.argument('service_bindings', nargs='*', options_list=['--bind'], help="Space separated list of services(bindings) to be connected to this app. e.g. SVC_NAME1[:BIND_NAME1] SVC_NAME2[:BIND_NAME2]...")
+        c.argument('service_bindings', nargs='*', options_list=['--bind', '--bind-java-component'], help="Space separated list of services(bindings) to be connected to this app. e.g. SVC_NAME1[:BIND_NAME1] SVC_NAME2[:BIND_NAME2]...")
         c.argument('service_type', help="The service information for dev services.")
         c.ignore('service_type')
 
