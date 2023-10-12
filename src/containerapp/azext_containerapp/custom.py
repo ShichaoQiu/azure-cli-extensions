@@ -190,7 +190,7 @@ def bind_java_component(cmd, name, resource_group_name, component_name, no_wait=
 def unbind_java_component(cmd, name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
     return update_containerapp(cmd, name, resource_group_name, unbind_service_bindings=component_name)
 
-def create_spring_boot_admin_service(cmd, service_name, environment_name, resource_group_name, yaml=None, no_wait=False,
+def create_spring_boot_admin_service(cmd, service_name, environment_name, resource_group_name, enable_dashboard=True, yaml=None, no_wait=False,
                          disable_warnings=True):
     return DevServiceUtils.create_service(cmd, service_name, environment_name, resource_group_name, no_wait,
                                           disable_warnings, DEV_SPRING_BOOT_ADMIN_IMAGE, DEV_SPRING_BOOT_ADMIN_SERVICE_TYPE,
@@ -199,7 +199,7 @@ def create_spring_boot_admin_service(cmd, service_name, environment_name, resour
 def delete_spring_boot_admin_service(cmd, service_name, resource_group_name, no_wait=False):
     return DevServiceUtils.delete_service(cmd, service_name, resource_group_name, no_wait, DEV_SPRING_BOOT_ADMIN_SERVICE_TYPE)
 
-def create_spring_cloud_eureka_service(cmd, service_name, environment_name, resource_group_name, yaml=None, no_wait=False,
+def create_spring_cloud_eureka_service(cmd, service_name, environment_name, resource_group_name, enable_dashboard=True, yaml=None, no_wait=False,
                          disable_warnings=True):
     return DevServiceUtils.create_service(cmd, service_name, environment_name, resource_group_name, no_wait,
                                           disable_warnings, DEV_SPRING_CLOUD_EUREKA_IMAGE, DEV_SPRING_CLOUD_EUREKA_SERVICE_TYPE,

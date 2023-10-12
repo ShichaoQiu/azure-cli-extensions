@@ -215,6 +215,14 @@ def load_arguments(self, _):
         c.argument('component_name', nargs='*',
                    help="Space separated list of java component(bindings) to be connected to this app. e.g. SVC_NAME1[:BIND_NAME1] SVC_NAME2[:BIND_NAME2]...")
 
+    with self.argument_context('containerapp env java-component spring-cloud-eureka create') as c:
+        c.argument('enable_dashboard', arg_type=get_three_state_flag(), default=True,
+                   help="Boolean indicating if enable the dashboard")
+
+    with self.argument_context('containerapp env java-component spring-boot-admin create') as c:
+        c.argument('enable_dashboard', arg_type=get_three_state_flag(), default=True,
+                   help="Boolean indicating if enable the dashboard")
+
     with self.argument_context('containerapp env create') as c:
         c.argument('zone_redundant', options_list=["--zone-redundant", "-z"], help="Enable zone redundancy on the environment. Cannot be used without --infrastructure-subnet-resource-id. If used with --location, the subnet's location must match")
         c.argument('enable_workload_profiles', arg_type=get_three_state_flag(), options_list=["--enable-workload-profiles", "-w"], help="Boolean indicating if the environment is enabled to have workload profiles")
