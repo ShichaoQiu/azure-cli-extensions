@@ -23,7 +23,7 @@ POLLING_TIMEOUT_FOR_MANAGED_CERTIFICATE = 1500  # how many seconds before exitin
 POLLING_INTERVAL_FOR_MANAGED_CERTIFICATE = 4  # how many seconds between requests
 HEADER_AZURE_ASYNC_OPERATION = "azure-asyncoperation"
 HEADER_LOCATION = "location"
-management_hostname = "https://capps-azapi-rp-460d4.azurewebsites.net/"
+management_hostname = "https://capps-azapi-rp-10a8c.azurewebsites.net/"
 
 class PollingAnimation():
     def __init__(self):
