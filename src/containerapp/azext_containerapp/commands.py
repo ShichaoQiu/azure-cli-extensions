@@ -94,6 +94,9 @@ def load_command_table(self, _):
         g.custom_command('bind', 'bind_java_component', supports_no_wait=True)
         g.custom_command('unbind', 'unbind_java_component', supports_no_wait=True)
 
+    with self.command_group('containerapp env java-component') as g:
+        g.custom_command('list', 'list_java_components')
+
     with self.command_group('containerapp env java-component spring-boot-admin') as g:
         g.custom_command('create', 'create_spring_boot_admin_service', supports_no_wait=True)
         g.custom_show_command('show', 'show_containerapp', table_transformer=transform_containerapp_output)

@@ -28,6 +28,7 @@ MANAGED_CERTIFICATE_RT = "managedCertificates"
 PRIVATE_CERTIFICATE_RT = "certificates"
 
 DEV_SERVICE_LIST = ["kafka", "postgres", "redis", "mariadb", "qdrant", "springbootadmin", "springcloudconfig", "springcloudeureka"]
+JAVA_COMPONENT_LIST = ["springbootadmin", "springcloudconfig", "springcloudeureka"]
 
 DEV_SPRING_BOOT_ADMIN_IMAGE = 'springbootadmin'
 DEV_SPRING_BOOT_ADMIN_SERVICE_TYPE = 'springbootadmin'
