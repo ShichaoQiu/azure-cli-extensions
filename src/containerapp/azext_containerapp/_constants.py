@@ -27,7 +27,19 @@ CONTAINER_APP_EXTENSION_TYPE = "microsoft.app.environment"
 MANAGED_CERTIFICATE_RT = "managedCertificates"
 PRIVATE_CERTIFICATE_RT = "certificates"
 
-DEV_SERVICE_LIST = ["kafka", "postgres", "redis", "mariadb", "qdrant"]
+DEV_SERVICE_LIST = ["kafka", "postgres", "redis", "mariadb", "qdrant", "springbootadmin", "springcloudconfig", "springcloudeureka"]
+
+DEV_SPRING_BOOT_ADMIN_IMAGE = 'springbootadmin'
+DEV_SPRING_BOOT_ADMIN_SERVICE_TYPE = 'springbootadmin'
+DEV_SPRING_BOOT_ADMIN_CONTAINER_NAME = 'springbootadmin'
+
+DEV_SPRING_CLOUD_CONFIG_IMAGE = 'springcloudconfig'
+DEV_SPRING_CLOUD_CONFIG_SERVICE_TYPE = 'springcloudconfig'
+DEV_SPRING_CLOUD_CONFIG_CONTAINER_NAME = 'springcloudconfig'
+
+DEV_SPRING_CLOUD_EUREKA_IMAGE = 'springcloudeureka'
+DEV_SPRING_CLOUD_EUREKA_SERVICE_TYPE = 'springcloudeureka'
+DEV_SPRING_CLOUD_EUREKA_CONTAINER_NAME = 'springcloudeureka'
 
 DEV_KAFKA_IMAGE = 'kafka'
 DEV_KAFKA_SERVICE_TYPE = 'kafka'

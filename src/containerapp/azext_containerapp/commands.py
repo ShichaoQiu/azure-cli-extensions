@@ -89,6 +89,19 @@ def load_command_table(self, _):
         g.custom_command('set', 'create_or_update_storage', supports_no_wait=True, exception_handler=ex_handler_factory())
         g.custom_command('remove', 'remove_storage', supports_no_wait=True, confirmation=True, exception_handler=ex_handler_factory())
 
+
+    with self.command_group('containerapp java-component') as g:
+        g.custom_command('bind', 'bind_java_component', supports_no_wait=True)
+        # g.custom_command('delete', 'delete_redis_service', confirmation=True, supports_no_wait=True)
+
+    with self.command_group('containerapp env java-component spring-boot-admin') as g:
+        g.custom_command('create', 'create_spring_boot_admin_service', supports_no_wait=True)
+        # g.custom_command('delete', 'delete_redis_service', confirmation=True, supports_no_wait=True)
+
+    with self.command_group('containerapp env java-component spring-cloud-eureka') as g:
+        g.custom_command('create', 'create_spring_cloud_eureka_service', supports_no_wait=True)
+        # g.custom_command('delete', 'delete_redis_service', confirmation=True, supports_no_wait=True)
+
     with self.command_group('containerapp service', is_preview=True) as g:
         g.custom_command('list', 'list_all_services')
 

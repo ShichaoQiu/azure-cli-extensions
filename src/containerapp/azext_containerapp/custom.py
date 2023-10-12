@@ -108,7 +108,10 @@ from ._constants import (MAXIMUM_SECRET_LENGTH, MICROSOFT_SECRET_SETTING_NAME, F
                          MANAGED_CERTIFICATE_RT, PRIVATE_CERTIFICATE_RT, PENDING_STATUS, SUCCEEDED_STATUS, DEV_POSTGRES_IMAGE, DEV_POSTGRES_SERVICE_TYPE,
                          DEV_POSTGRES_CONTAINER_NAME, DEV_REDIS_IMAGE, DEV_REDIS_SERVICE_TYPE, DEV_REDIS_CONTAINER_NAME, DEV_KAFKA_CONTAINER_NAME,
                          DEV_KAFKA_IMAGE, DEV_KAFKA_SERVICE_TYPE, DEV_MARIADB_CONTAINER_NAME, DEV_MARIADB_IMAGE, DEV_MARIADB_SERVICE_TYPE, DEV_QDRANT_IMAGE,
-                         DEV_QDRANT_CONTAINER_NAME, DEV_QDRANT_SERVICE_TYPE, DEV_SERVICE_LIST, CONTAINER_APPS_SDK_MODELS, BLOB_STORAGE_TOKEN_STORE_SECRET_SETTING_NAME)
+                         DEV_QDRANT_CONTAINER_NAME, DEV_QDRANT_SERVICE_TYPE, DEV_SERVICE_LIST, CONTAINER_APPS_SDK_MODELS, BLOB_STORAGE_TOKEN_STORE_SECRET_SETTING_NAME,
+                         DEV_SPRING_BOOT_ADMIN_IMAGE, DEV_SPRING_BOOT_ADMIN_SERVICE_TYPE, DEV_SPRING_BOOT_ADMIN_CONTAINER_NAME, DEV_SPRING_CLOUD_CONFIG_IMAGE,
+                         DEV_SPRING_CLOUD_CONFIG_SERVICE_TYPE, DEV_SPRING_CLOUD_CONFIG_CONTAINER_NAME, DEV_SPRING_CLOUD_EUREKA_IMAGE, DEV_SPRING_CLOUD_EUREKA_SERVICE_TYPE,
+                         DEV_SPRING_CLOUD_EUREKA_CONTAINER_NAME)
 
 logger = get_logger(__name__)
 
@@ -181,6 +184,20 @@ def create_deserializer():
 
     return Deserializer(deserializer)
 
+def bind_java_component(cmd, name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
+    return update_containerapp(cmd, name, resource_group_name, service_bindings=component_name)
+
+def create_spring_boot_admin_service(cmd, service_name, environment_name, resource_group_name, no_wait=False,
+                         disable_warnings=True):
+    return DevServiceUtils.create_service(cmd, service_name, environment_name, resource_group_name, no_wait,
+                                          disable_warnings, DEV_SPRING_BOOT_ADMIN_IMAGE, DEV_SPRING_BOOT_ADMIN_SERVICE_TYPE,
+                                          DEV_SPRING_BOOT_ADMIN_CONTAINER_NAME)
+
+def create_spring_cloud_eureka_service(cmd, service_name, environment_name, resource_group_name, no_wait=False,
+                         disable_warnings=True):
+    return DevServiceUtils.create_service(cmd, service_name, environment_name, resource_group_name, no_wait,
+                                          disable_warnings, DEV_SPRING_CLOUD_EUREKA_IMAGE, DEV_SPRING_CLOUD_EUREKA_SERVICE_TYPE,
+                                          DEV_SPRING_CLOUD_EUREKA_CONTAINER_NAME)
 
 def list_all_services(cmd, environment_name, resource_group_name):
     services = list_containerapp(cmd, resource_group_name=resource_group_name, managed_env=environment_name)
