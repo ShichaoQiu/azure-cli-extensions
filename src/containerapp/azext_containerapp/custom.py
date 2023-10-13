@@ -223,11 +223,19 @@ def create_spring_cloud_eureka_service(cmd, service_name, environment_name, reso
                                           DEV_SPRING_CLOUD_EUREKA_CONTAINER_NAME, yaml)
 
 
+def delete_spring_cloud_eureka_service(cmd, service_name, resource_group_name, no_wait=False):
+    return DevServiceUtils.delete_service(cmd, service_name, resource_group_name, no_wait, DEV_SPRING_CLOUD_EUREKA_SERVICE_TYPE)
+
+
 def create_spring_cloud_config_service(cmd, service_name, environment_name, resource_group_name, yaml=None, no_wait=False,
                          disable_warnings=True):
     return DevServiceUtils.create_service(cmd, service_name, environment_name, resource_group_name, no_wait,
                                           disable_warnings, DEV_SPRING_CLOUD_CONFIG_IMAGE, DEV_SPRING_CLOUD_CONFIG_SERVICE_TYPE,
                                           DEV_SPRING_CLOUD_CONFIG_CONTAINER_NAME, yaml)
+
+
+def delete_spring_cloud_config_service(cmd, service_name, resource_group_name, no_wait=False):
+    return DevServiceUtils.delete_service(cmd, service_name, resource_group_name, no_wait, DEV_SPRING_CLOUD_CONFIG_SERVICE_TYPE)
 
 
 def list_all_services(cmd, environment_name, resource_group_name):
