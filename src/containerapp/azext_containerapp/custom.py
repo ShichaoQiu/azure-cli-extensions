@@ -1583,3 +1583,57 @@ def connected_env_remove_storage(cmd, storage_name, name, resource_group_name):
         return ConnectedEnvStorageClient.delete(cmd, resource_group_name, name, storage_name)
     except CLIError as e:
         handle_raw_exception(e)
+
+
+def env_list_java_components(cmd, environment_name, resource_group_name):
+    return "env_list_java_components"
+
+
+def list_java_components(cmd, environment_name, resource_group_name):
+    return "list_java_components"
+
+
+def bind_java_components(cmd, name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
+    return "bind_java_component"
+
+
+def unbind_java_components(cmd, name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
+    return "unbind_java_component"
+
+
+def create_spring_cloud_config(cmd, service_name, environment_name, resource_group_name, yaml=None, no_wait=False,
+                         disable_warnings=True):
+    return "create_spring_cloud_config"
+
+
+def update_spring_cloud_config(cmd, service_name, environment_name, resource_group_name, yaml=None, no_wait=False,
+                         disable_warnings=True):
+    return "update_spring_cloud_config"
+
+
+def show_spring_cloud_config(cmd, service_name, environment_name, resource_group_name, yaml=None, no_wait=False,
+                         disable_warnings=True):
+    return "show_spring_cloud_config"
+
+
+def delete_spring_cloud_config(cmd, service_name, resource_group_name, no_wait=False):
+    return "delete_spring_cloud_config"
+
+
+def create_spring_cloud_eureka(cmd, service_name, environment_name, resource_group_name, enable_dashboard=True, yaml=None, no_wait=False,
+                         disable_warnings=True):
+    return "create_spring_cloud_eureka"
+
+
+def update_spring_cloud_eureka(cmd, service_name, environment_name, resource_group_name, enable_dashboard=True, yaml=None, no_wait=False,
+                         disable_warnings=True):
+    return "update_spring_cloud_eureka"
+
+
+def show_spring_cloud_eureka(cmd, service_name, environment_name, resource_group_name, enable_dashboard=True, yaml=None, no_wait=False,
+                         disable_warnings=True):
+    return "show_spring_cloud_eureka"
+
+
+def delete_spring_cloud_eureka(cmd, service_name, resource_group_name, no_wait=False):
+    return "delete_spring_cloud_eureka"
