@@ -159,3 +159,15 @@ def load_arguments(self, _):
         c.argument('dapr_component_name', help="The Dapr component name.")
         c.argument('environment_name', options_list=['--name', '-n'], help="The environment name.")
         c.argument('yaml', type=file_type, help='Path to a .yaml file with the configuration of a Dapr component. All other parameters will be ignored. For an example, see https://learn.microsoft.com/en-us/azure/container-apps/dapr-overview?tabs=bicep1%2Cyaml#component-schema')
+
+    with self.argument_context('containerapp java-component') as c:
+        c.argument('container_app_name', options_list=['--name', '-n'], help="The container app name.")
+        c.argument('environment_name', options_list=['--environment'], help="The environment name.")
+        c.argument('resource_group_name', arg_type=resource_group_name_type, id_part=None)
+        c.argument('component_name', nargs='*', help="Space separated list of Java components to be connected to this app. e.g. JAVA_COMPONENT1 JAVA_COMPONENT2...")
+
+    with self.argument_context('containerapp env java-component') as c:
+        c.argument('java_component_name', options_list=['--name', '-n'], help="The Java component name.")
+        c.argument('environment_name', options_list=['--environment'], help="The environment name.")
+        c.argument('resource_group_name', arg_type=resource_group_name_type, id_part=None)
+        c.argument('yaml', type=file_type, help='Path to a .yaml file with the configuration of the Java component.')
