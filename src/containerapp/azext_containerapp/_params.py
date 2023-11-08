@@ -28,9 +28,6 @@ def load_arguments(self, _):
         c.argument('service_type', help="The service information for dev services.")
         c.ignore('service_type')
 
-    with self.argument_context('containerapp create', arg_group='Java Component Binding', is_preview=True) as c:
-        c.argument('bind_java_component', nargs='*', help="Space separated list of Java components to be connected to this app. e.g. JAVA_COMPONENT1 JAVA_COMPONENT2...")
-
     with self.argument_context('containerapp create', arg_group='GitHub Repository', is_preview=True) as c:
         c.argument('repo', help='Create an app via GitHub Actions in the format: https://github.com/<owner>/<repository-name> or <owner>/<repository-name>')
         c.argument('token', help='A Personal Access Token with write access to the specified repository. For more information: https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line. If not provided or not found in the cache (and using --repo), a browser page will be opened to authenticate with Github.')
@@ -48,10 +45,6 @@ def load_arguments(self, _):
     with self.argument_context('containerapp update', arg_group='Service Binding') as c:
         c.argument('service_bindings', nargs='*', options_list=['--bind'], help="Space separated list of services(bindings) to be connected to this app. e.g. SVC_NAME1[:BIND_NAME1] SVC_NAME2[:BIND_NAME2]...")
         c.argument('unbind_service_bindings', nargs='*', options_list=['--unbind'], help="Space separated list of services(bindings) to be removed from this app. e.g. BIND_NAME1...")
-
-    with self.argument_context('containerapp update', arg_group='Java Component Binding', is_preview=True) as c:
-        c.argument('bind_java_component', nargs='*', help="Space separated list of Java components to be connected to this app. e.g. JAVA_COMPONENT1 JAVA_COMPONENT2...")
-        c.argument('unbind_java_component', nargs='*', help="Space separated list of Java components to be removed from this app. e.g. JAVA_COMPONENT1 JAVA_COMPONENT2...")
 
     with self.argument_context('containerapp env', arg_group='Virtual Network') as c:
         c.argument('infrastructure_resource_group', options_list=['--infrastructure-resource-group', '-i'], help='Name for resource group that will contain infrastructure resources. If not provided, a resource group name will be generated.', is_preview=True)
@@ -166,12 +159,6 @@ def load_arguments(self, _):
         c.argument('dapr_component_name', help="The Dapr component name.")
         c.argument('environment_name', options_list=['--name', '-n'], help="The environment name.")
         c.argument('yaml', type=file_type, help='Path to a .yaml file with the configuration of a Dapr component. All other parameters will be ignored. For an example, see https://learn.microsoft.com/en-us/azure/container-apps/dapr-overview?tabs=bicep1%2Cyaml#component-schema')
-
-    with self.argument_context('containerapp java-component') as c:
-        c.argument('container_app_name', options_list=['--name', '-n'], help="The container app name.")
-        c.argument('environment_name', options_list=['--environment'], help="The environment name.")
-        c.argument('resource_group_name', arg_type=resource_group_name_type, id_part=None)
-        c.argument('component_name', nargs='*', help="Space separated list of Java components to be connected to this app. e.g. JAVA_COMPONENT1 JAVA_COMPONENT2...")
 
     with self.argument_context('containerapp env java-component') as c:
         c.argument('java_component_name', options_list=['--name', '-n'], help="The Java component name.")

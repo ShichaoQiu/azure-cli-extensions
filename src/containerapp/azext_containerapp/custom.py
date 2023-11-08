@@ -187,7 +187,6 @@ def create_containerapp(cmd,
                         dapr_enable_api_logging=False,
                         service_type=None,
                         service_bindings=None,
-                        bind_java_component=None,
                         revision_suffix=None,
                         startup_command=None,
                         args=None,
@@ -295,8 +294,6 @@ def update_containerapp(cmd,
                         scale_rule_auth=None,
                         unbind_service_bindings=None,
                         service_bindings=None,
-                        unbind_java_component=None,
-                        bind_java_component=None,
                         set_env_vars=None,
                         remove_env_vars=None,
                         replace_env_vars=None,
@@ -1588,20 +1585,8 @@ def connected_env_remove_storage(cmd, storage_name, name, resource_group_name):
         handle_raw_exception(e)
 
 
-def env_list_java_components(cmd, environment_name, resource_group_name):
-    return "env_list_java_components"
-
-
-def list_java_components(cmd, container_app_name, environment_name, resource_group_name):
+def list_java_components(cmd, environment_name, resource_group_name):
     return "list_java_components"
-
-
-def bind_java_components(cmd, container_app_name, environment_name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
-    return "bind_java_component"
-
-
-def unbind_java_components(cmd, container_app_name, environment_name, resource_group_name, component_name, no_wait=False, disable_warnings=True):
-    return "unbind_java_component"
 
 
 def create_spring_cloud_config(cmd, java_component_name, environment_name, resource_group_name, yaml=None, no_wait=False, disable_warnings=True):

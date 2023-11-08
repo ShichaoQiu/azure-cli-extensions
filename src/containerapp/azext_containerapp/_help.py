@@ -913,26 +913,6 @@ helps['containerapp job create'] = """
 """
 
 # Java Components Commands
-helps['containerapp java-component'] = """
-    type: group
-    short-summary: Commands to manage Java components within the container app.
-"""
-
-helps['containerapp java-component list'] = """
-    type: command
-    short-summary: List all Java components within the container app.
-"""
-
-helps['containerapp java-component bind'] = """
-    type: command
-    short-summary: Bind Java components with the container app.
-"""
-
-helps['containerapp java-component unbind'] = """
-    type: command
-    short-summary: Unbind Java components with the container app.
-"""
-
 helps['containerapp env java-component'] = """
     type: group
     short-summary: Commands to manage Java components within the environment.

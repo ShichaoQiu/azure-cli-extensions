@@ -112,12 +112,7 @@ def load_command_table(self, _):
         g.custom_command('remove', 'connected_env_remove_storage', supports_no_wait=True, confirmation=True, exception_handler=ex_handler_factory())
 
     with self.command_group('containerapp env java-component', is_preview=True) as g:
-        g.custom_command('list', 'env_list_java_components')
-
-    with self.command_group('containerapp java-component', is_preview=True) as g:
         g.custom_command('list', 'list_java_components')
-        g.custom_command('bind', 'bind_java_components', supports_no_wait=True)
-        g.custom_command('unbind', 'unbind_java_components', supports_no_wait=True)
 
     with self.command_group('containerapp env java-component spring-cloud-config') as g:
         g.custom_command('create', 'create_spring_cloud_config', supports_no_wait=True)
