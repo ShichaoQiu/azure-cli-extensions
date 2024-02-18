@@ -755,6 +755,8 @@ def validate_managed_environment(namespace):
         managed_environment = parse_resource_id(managed_environment_id)
         if managed_environment['namespace'].lower() != 'microsoft.app' or managed_environment['type'].lower() != 'managedenvironments':
             raise InvalidArgumentValueError('--managed-environment {0} is not a valid Container App Environment resource ID'.format(managed_environment_id))
+        if namespace.sku.tier.lower() != 'standardgen2':
+            raise InvalidArgumentValueError('--managed-environment is only supported in StandardGen2, you can use --sku to specify the SKU')
 
 
 def validate_server_version(cmd, namespace):
