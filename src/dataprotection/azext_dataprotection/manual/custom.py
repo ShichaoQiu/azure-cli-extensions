@@ -26,7 +26,7 @@ from azure.cli.core.commands.client_factory import get_mgmt_service_client
 from azure.cli.command_modules.role.custom import list_role_assignments, create_role_assignment
 from knack.log import get_logger
 from knack.prompting import prompt_y_n
-from msrestazure.tools import is_valid_resource_id, parse_resource_id
+from azure.mgmt.core.tools import is_valid_resource_id, parse_resource_id
 from azext_dataprotection.vendored_sdks.resourcegraph.models import \
     QueryRequest, QueryRequestOptions
 from azext_dataprotection.manual import backupcenter_helper, helpers as helper
@@ -218,7 +218,8 @@ def dataprotection_backup_instance_update(cmd, resource_group_name, vault_name, 
     })
 
 
-def dataprotection_backup_instance_update_policy(cmd, resource_group_name, vault_name, backup_instance_name, policy_id, no_wait=False):
+def dataprotection_backup_instance_update_policy(cmd, resource_group_name, vault_name, backup_instance_name, policy_id, no_wait=False,
+                                                 resource_guard_operation_requests=None, tenant_id=None):
     # For some reason, the auto-generated Backup Instance Update does not contain some fields. Prominently
     # in this situation, it is missing the properties.policyInfo.policyParameters section entirely, even though
     # Backup Instance Create contains it. To get around this, we have a modified Update function that basically
@@ -243,6 +244,8 @@ def dataprotection_backup_instance_update_policy(cmd, resource_group_name, vault
         "backup_instance": backup_instance,
         "resource_group": resource_group_name,
         "vault_name": vault_name,
+        "resource_guard_operation_requests": resource_guard_operation_requests,
+        "tenant_id": tenant_id,
     })
 
 
@@ -859,11 +862,18 @@ def dataprotection_backup_instance_initialize_restoreconfig(datasource_type, exc
                                                             persistent_volume_restore_mode=None,
                                                             include_cluster_scope_resources=None,
                                                             namespace_mappings=None, conflict_policy=None,
-                                                            restore_hook_references=None):
+                                                            restore_hook_references=None, staging_resource_group_id=None,
+                                                            staging_storage_account_id=None, resource_modifier_reference=None):
     if datasource_type != "AzureKubernetesService":
         raise InvalidArgumentValueError("This command is currently not supported for datasource types other than AzureKubernetesService")
 
-    object_type = "KubernetesClusterRestoreCriteria"
+    if staging_resource_group_id is None and staging_storage_account_id is None:
+        object_type = "KubernetesClusterRestoreCriteria"
+    elif staging_storage_account_id is not None and staging_resource_group_id is not None:
+        object_type = "KubernetesClusterVaultTierRestoreCriteria"
+    else:
+        raise InvalidArgumentValueError("Both --staging-resource-group-id and --staging-storage-account-id are manadatory for vaulted tier restore "
+                                        "for AzureKubernetesService. Please either provide or remove both of them.")
 
     if persistent_volume_restore_mode is None:
         persistent_volume_restore_mode = "RestoreWithVolumeData"
@@ -883,7 +893,10 @@ def dataprotection_backup_instance_initialize_restoreconfig(datasource_type, exc
         "include_cluster_scope_resources": include_cluster_scope_resources,
         "conflict_policy": conflict_policy,
         "namespace_mappings": namespace_mappings,
-        "restore_hook_references": restore_hook_references
+        "restore_hook_references": restore_hook_references,
+        "staging_resource_group_id": staging_resource_group_id,
+        "staging_storage_account_id": staging_storage_account_id,
+        "resource_modifier_reference": resource_modifier_reference
     }
 
 
@@ -924,7 +937,7 @@ def restore_initialize_for_data_recovery(cmd, datasource_type, source_datastore,
     if datasource_type == 'AzureKubernetesService':
         restore_request["restore_target_info"]["object_type"] = "ItemLevelRestoreTargetInfo"
         restore_request["restore_target_info"]["restore_criteria"] = helper.get_resource_criteria_list(datasource_type, restore_configuration,
-                                                                                                       None, None, None, None)
+                                                                                                       None, None, None, None, None)
 
     return restore_request
 

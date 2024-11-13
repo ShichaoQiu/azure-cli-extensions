@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-# pylint: disable=line-too-long, super-with-arguments, too-many-instance-attributes, consider-using-f-string, no-else-return, no-self-use
+# pylint: disable=line-too-long, no-else-return, useless-return, broad-except, no-else-raise
 
 import json
 import os
@@ -26,7 +26,7 @@ from knack.log import get_logger
 
 logger = get_logger(__name__)
 
-PREVIEW_API_VERSION = "2024-02-02-preview"
+PREVIEW_API_VERSION = "2024-10-02-preview"
 POLLING_TIMEOUT = 1500  # how many seconds before exiting
 POLLING_SECONDS = 2  # how many seconds between requests
 POLLING_TIMEOUT_FOR_MANAGED_CERTIFICATE = 1500  # how many seconds before exiting
@@ -34,6 +34,7 @@ POLLING_INTERVAL_FOR_MANAGED_CERTIFICATE = 4  # how many seconds between request
 HEADER_AZURE_ASYNC_OPERATION = "azure-asyncoperation"
 HEADER_LOCATION = "location"
 SESSION_RESOURCE = "https://dynamicsessions.io"
+MAINTENANCE_CONFIG_DEFAULT_NAME = "default"
 
 
 class GitHubActionPreviewClient(GitHubActionClient):
@@ -47,6 +48,38 @@ class ContainerAppPreviewClient(ContainerAppClient):
 
 class ContainerAppsJobPreviewClient(ContainerAppsJobClient):
     api_version = PREVIEW_API_VERSION
+    LOG_STREAM_API_VERSION = "2023-11-02-preview"
+
+    @classmethod
+    def get_replicas(cls, cmd, resource_group_name, name, execution_name):
+        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        sub_id = get_subscription_id(cmd.cli_ctx)
+        url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}/executions/{}/replicas?api-version={}"
+        request_url = url_fmt.format(
+            management_hostname.strip('/'),
+            sub_id,
+            resource_group_name,
+            name,
+            execution_name,
+            cls.LOG_STREAM_API_VERSION)
+
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        return r.json()
+
+    @classmethod
+    def get_auth_token(cls, cmd, resource_group_name, name):
+        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        sub_id = get_subscription_id(cmd.cli_ctx)
+        url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/jobs/{}/getAuthToken?api-version={}"
+        request_url = url_fmt.format(
+            management_hostname.strip('/'),
+            sub_id,
+            resource_group_name,
+            name,
+            cls.LOG_STREAM_API_VERSION)
+
+        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
+        return r.json()
 
 
 class ContainerAppsResiliencyPreviewClient():
@@ -276,28 +309,6 @@ class DaprComponentResiliencyPreviewClient():
             policy_list.append(policy)
 
         return policy_list
-
-
-class SubscriptionPreviewClient():
-    api_version = PREVIEW_API_VERSION
-
-    @classmethod
-    def show_custom_domain_verification_id(cls, cmd):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
-        sub_id = get_subscription_id(cmd.cli_ctx)
-        request_url = f"{management_hostname}subscriptions/{sub_id}/providers/Microsoft.App/getCustomDomainVerificationId?api-version={cls.api_version}"
-
-        r = send_raw_request(cmd.cli_ctx, "POST", request_url)
-        return r.json()
-
-    @classmethod
-    def list_usages(cls, cmd, location):
-        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
-        sub_id = get_subscription_id(cmd.cli_ctx)
-        request_url = f"{management_hostname}subscriptions/{sub_id}/providers/Microsoft.App/locations/{location}/usages?api-version={cls.api_version}"
-
-        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
-        return r.json()
 
 
 class StoragePreviewClient(StorageClient):
@@ -541,7 +552,7 @@ class ConnectedEnvCertificateClient():
         return certs_list
 
     @classmethod
-    def create_or_update_certificate(cls, cmd, resource_group_name, name, certificate_name, certificate):
+    def create_or_update_certificate(cls, cmd, resource_group_name, name, certificate_name, certificate, no_wait=False):
         management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
         url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/Microsoft.App/connectedEnvironments/{}/certificates/{}?api-version={}"
@@ -554,6 +565,13 @@ class ConnectedEnvCertificateClient():
             cls.api_version)
 
         r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(certificate))
+        if no_wait:
+            return r.json()
+        elif r.status_code == 201:
+            operation_url = r.headers.get(HEADER_AZURE_ASYNC_OPERATION)
+            poll_status(cmd, operation_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+
         return r.json()
 
     @classmethod
@@ -592,7 +610,7 @@ class ConnectedEnvDaprComponentClient():
     api_version = PREVIEW_API_VERSION
 
     @classmethod
-    def create_or_update(cls, cmd, resource_group_name, environment_name, name, dapr_component_envelope):
+    def create_or_update(cls, cmd, resource_group_name, environment_name, name, dapr_component_envelope, no_wait=False):
 
         management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
         sub_id = get_subscription_id(cmd.cli_ctx)
@@ -606,6 +624,13 @@ class ConnectedEnvDaprComponentClient():
             cls.api_version)
 
         r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(dapr_component_envelope))
+
+        if no_wait:
+            return r.json()
+        elif r.status_code == 201:
+            operation_url = r.headers.get(HEADER_AZURE_ASYNC_OPERATION)
+            poll_status(cmd, operation_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
 
         return r.json()
 
@@ -1136,11 +1161,11 @@ class SessionCodeInterpreterPreviewClient():
 
     @classmethod
     def execute(cls, cmd, identifier, code_interpreter_envelope, session_pool_endpoint, no_wait=False):
-        url_fmt = "{}/code/execute?identifier={}&api-version={}"
+        url_fmt = "{}/executions?identifier={}&api-version={}"
         request_url = url_fmt.format(
             session_pool_endpoint,
             identifier,
-            PREVIEW_API_VERSION)
+            cls.api_version)
         logger.warning(request_url)
         logger.warning(code_interpreter_envelope)
         r = send_raw_request(cmd.cli_ctx, "POST", request_url, body=json.dumps(code_interpreter_envelope), resource=SESSION_RESOURCE)
@@ -1155,12 +1180,13 @@ class SessionCodeInterpreterPreviewClient():
         return r.json()
 
     @classmethod
-    def upload(cls, cmd, identifier, filepath, session_pool_endpoint, no_wait=False):
-        url_fmt = "{}/files/upload?identifier={}&api-version={}"
+    def upload(cls, cmd, identifier, filepath, path, session_pool_endpoint, no_wait=False):
+        url_fmt = "{}/files?{}identifier={}&api-version={}"
         request_url = url_fmt.format(
             session_pool_endpoint,
+            f"path={path}&" if path is not None else "",
             identifier,
-            PREVIEW_API_VERSION)
+            cls.api_version)
 
         from azure.cli.core._profile import Profile
         profile = Profile(cli_ctx=cmd.cli_ctx)
@@ -1195,13 +1221,15 @@ class SessionCodeInterpreterPreviewClient():
         return r.json()
 
     @classmethod
-    def show_file_content(cls, cmd, identifier, filename, session_pool_endpoint):
-        url_fmt = "{}/files/content/{}?identifier={}&api-version={}"
+    def show_file_content(cls, cmd, identifier, filename, path, session_pool_endpoint):
+        path, filename = cls.extract_path_from_filename(path, filename)
+        url_fmt = "{}/files/{}/content?{}identifier={}&api-version={}"
         request_url = url_fmt.format(
             session_pool_endpoint,
             filename,
+            f"path={path}&" if path is not None else "",
             identifier,
-            PREVIEW_API_VERSION)
+            cls.api_version)
 
         r = send_raw_request(cmd.cli_ctx, "GET", request_url, resource=SESSION_RESOURCE)
         # print out the file content as bytes decoded as string
@@ -1210,26 +1238,30 @@ class SessionCodeInterpreterPreviewClient():
         return json.dumps(r.content.decode())
 
     @classmethod
-    def show_file_metadata(cls, cmd, identifier, filename, session_pool_endpoint):
-        url_fmt = "{}/files/{}?identifier={}&api-version={}"
+    def show_file_metadata(cls, cmd, identifier, filename, path, session_pool_endpoint):
+        path, filename = cls.extract_path_from_filename(path, filename)
+        url_fmt = "{}/files/{}?{}identifier={}&api-version={}"
         request_url = url_fmt.format(
             session_pool_endpoint,
             filename,
+            f"path={path}&" if path is not None else "",
             identifier,
-            PREVIEW_API_VERSION)
+            cls.api_version)
         logger.warning(request_url)
         r = send_raw_request(cmd.cli_ctx, "GET", request_url, resource=SESSION_RESOURCE)
 
         return r.json()
 
     @classmethod
-    def delete_file(cls, cmd, identifier, filename, session_pool_endpoint, no_wait=False):
-        url_fmt = "{}/files/{}?identifier={}&api-version={}"
+    def delete_file(cls, cmd, identifier, filename, path, session_pool_endpoint, no_wait=False):
+        path, filename = cls.extract_path_from_filename(path, filename)
+        url_fmt = "{}/files/{}?{}identifier={}&api-version={}"
         request_url = url_fmt.format(
             session_pool_endpoint,
             filename,
+            f"path={path}&" if path is not None else "",
             identifier,
-            PREVIEW_API_VERSION)
+            cls.api_version)
 
         r = send_raw_request(cmd.cli_ctx, "DELETE", request_url, resource=SESSION_RESOURCE)
 
@@ -1251,10 +1283,20 @@ class SessionCodeInterpreterPreviewClient():
             session_pool_endpoint,
             identifier,
             path,
-            PREVIEW_API_VERSION)
+            cls.api_version)
 
         r = send_raw_request(cmd.cli_ctx, "GET", request_url, resource=SESSION_RESOURCE)
         return r.json()
+
+    @staticmethod
+    def extract_path_from_filename(path, filename):
+        if '/' not in filename:
+            return path, filename
+        path_in_filename, filename = filename.rsplit('/', 1)
+        if path is None:
+            return path_in_filename, filename
+        else:
+            return path.rstrip("/") + "/" + path_in_filename.lstrip('/'), filename
 
 
 class DotNetComponentPreviewClient():
@@ -1371,3 +1413,74 @@ class DotNetComponentPreviewClient():
             dotNet_component_list.append(component)
 
         return dotNet_component_list
+
+
+class MaintenanceConfigPreviewClient():
+    api_version = PREVIEW_API_VERSION
+    maintenance_config_name = MAINTENANCE_CONFIG_DEFAULT_NAME
+
+    @classmethod
+    def list(cls, cmd, resource_group_name, environment_name):
+        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        sub_id = get_subscription_id(cmd.cli_ctx)
+        url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/microsoft.app/managedenvironments/{}/maintenanceConfigurations/{}?api-version={}"
+        request_url = url_fmt.format(
+            management_hostname.strip('/'),
+            sub_id,
+            resource_group_name,
+            environment_name,
+            cls.maintenance_config_name,
+            cls.api_version)
+
+        r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+
+        return r.json()
+
+    @classmethod
+    def create_or_update(cls, cmd, resource_group_name, environment_name, maintenance_config_envelope):
+        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        sub_id = get_subscription_id(cmd.cli_ctx)
+        url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/microsoft.app/managedenvironments/{}/maintenanceConfigurations/{}?api-version={}"
+        request_url = url_fmt.format(
+            management_hostname.strip('/'),
+            sub_id,
+            resource_group_name,
+            environment_name,
+            cls.maintenance_config_name,
+            cls.api_version)
+
+        r = send_raw_request(cmd.cli_ctx, "PUT", request_url, body=json.dumps(maintenance_config_envelope))
+
+        if r.status_code == 201:
+            operation_url = r.headers.get(HEADER_AZURE_ASYNC_OPERATION)
+            poll_status(cmd, operation_url)
+            r = send_raw_request(cmd.cli_ctx, "GET", request_url)
+        if r.status_code == 202:
+            operation_url = r.headers.get(HEADER_LOCATION)
+            response = poll_results(cmd, operation_url)
+            if response is None:
+                raise ResourceNotFoundError("Could not find the maintenance config")
+            else:
+                return response
+
+        return r.json()
+
+    @classmethod
+    def remove(cls, cmd, resource_group_name, environment_name):
+        management_hostname = cmd.cli_ctx.cloud.endpoints.resource_manager
+        sub_id = get_subscription_id(cmd.cli_ctx)
+        url_fmt = "{}/subscriptions/{}/resourceGroups/{}/providers/microsoft.app/managedenvironments/{}/maintenanceConfigurations/{}?api-version={}"
+        request_url = url_fmt.format(
+            management_hostname.strip('/'),
+            sub_id,
+            resource_group_name,
+            environment_name,
+            cls.maintenance_config_name,
+            cls.api_version)
+
+        r = send_raw_request(cmd.cli_ctx, "DELETE", request_url)
+
+        if r.status_code in [200, 201, 202, 204]:
+            if r.status_code == 202:
+                operation_url = r.headers.get(HEADER_LOCATION)
+                poll_results(cmd, operation_url)

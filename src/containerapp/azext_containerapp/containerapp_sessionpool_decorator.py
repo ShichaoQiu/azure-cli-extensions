@@ -3,13 +3,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
+# pylint: disable=line-too-long, broad-except, logging-format-interpolation, too-many-public-methods
 
 import uuid
 from copy import deepcopy
 from knack.log import get_logger
 from enum import Enum
 from typing import Any, Dict
-from msrestazure.tools import parse_resource_id
+from azure.mgmt.core.tools import parse_resource_id
 from azure.cli.core.util import send_raw_request
 from azure.cli.core.azclierror import HTTPError
 import json
@@ -24,12 +25,13 @@ from azure.cli.command_modules.containerapp._utils import (parse_env_var_flags, 
                                                            store_as_secret_and_return_secret_ref,
                                                            _ensure_location_allowed, CONTAINER_APPS_RP,
                                                            validate_container_app_name,
-                                                           safe_set, safe_get)
+                                                           safe_set, safe_get, _ensure_identity_resource_id)
 from azure.cli.command_modules.containerapp._clients import ManagedEnvironmentClient
 from azure.cli.command_modules.containerapp._client_factory import handle_non_404_status_code_exception
+from azure.cli.command_modules.containerapp._utils import is_registry_msi_system
 from azure.cli.core.commands.client_factory import get_subscription_id
 
-from ._models import SessionPool as SessionPoolModel
+from ._models import ManagedServiceIdentity, SessionPool as SessionPoolModel
 from ._client_factory import handle_raw_exception
 from ._utils import AppType
 
@@ -41,6 +43,7 @@ logger = get_logger(__name__)
 class ContainerType(Enum):
     PythonLTS = 0
     CustomContainer = 2
+    NodeLTS = 3
 
 
 class SessionPoolPreviewDecorator(BaseResource):
@@ -127,6 +130,16 @@ class SessionPoolPreviewDecorator(BaseResource):
     def get_argument_registry_user(self):
         return self.get_param("registry_user")
 
+    def get_argument_registry_identity(self):
+        return self.get_param("registry_identity")
+
+    def get_argument_system_assigned(self):
+        return self.get_param("mi_system_assigned")
+
+    def get_argument_user_assigned(self):
+        return self.get_param("mi_user_assigned")
+
+    # pylint: disable=no-self-use
     def get_environment_client(self):
         return ManagedEnvironmentClient
 
@@ -150,6 +163,7 @@ class SessionPoolCreateDecorator(SessionPoolPreviewDecorator):
 
     def construct_payload(self):
         self.session_pool_def["location"] = self.get_argument_location()
+        self.set_up_managed_identity()
 
         # We only support 'Dynamic' type in CLI
         self.session_pool_def["properties"]["poolManagementType"] = "Dynamic"
@@ -171,7 +185,8 @@ class SessionPoolCreateDecorator(SessionPoolPreviewDecorator):
 
             container_def = self.set_up_container()
             ingress_def = self.set_up_ingress()
-            registry_def = self.set_up_registry_auth_configuration(secrets_def)
+            registry_def, updated_secret_def = self.set_up_registry_auth_configuration(secrets_def)
+            secrets_def = updated_secret_def
 
             customer_container_template["containers"] = [container_def]
             customer_container_template["ingress"] = ingress_def
@@ -182,6 +197,59 @@ class SessionPoolCreateDecorator(SessionPoolPreviewDecorator):
         safe_set(self.session_pool_def, "properties", "dynamicPoolConfiguration", value=dynamic_pool_def)
         safe_set(self.session_pool_def, "properties", "sessionNetworkConfiguration", value=session_network_def)
         safe_set(self.session_pool_def, "properties", "scaleConfiguration", value=session_scale_def)
+        self.set_up_managed_identity_settings()
+
+    def set_up_managed_identity_settings(self):
+        managed_identity_settings = []
+        if self.get_argument_system_assigned():
+            managed_identity_setting = {
+                "identity": "system",
+                "lifecycle": "Main"
+            }
+            managed_identity_settings.append(managed_identity_setting)
+
+        if self.get_argument_user_assigned():
+            for x in self.get_argument_user_assigned():
+                managed_identity_setting = {
+                    "identity": x.lower(),
+                    "lifecycle": "Main"
+                }
+                managed_identity_settings.append(managed_identity_setting)
+        if managed_identity_settings:
+            safe_set(self.session_pool_def, "properties", "managedIdentitySettings", value=managed_identity_settings)
+
+    def set_up_managed_identity(self):
+        identity_def = deepcopy(ManagedServiceIdentity)
+        identity_def["type"] = "None"
+
+        assign_system_identity = self.get_argument_system_assigned()
+        if self.get_argument_user_assigned():
+            assign_user_identities = [x.lower() for x in self.get_argument_user_assigned()]
+        else:
+            assign_user_identities = []
+
+        identity = self.get_argument_registry_identity()
+        if identity:
+            if is_registry_msi_system(identity):
+                assign_system_identity = True
+            else:
+                assign_user_identities.append(self.get_argument_registry_identity())
+
+        if assign_system_identity and assign_user_identities:
+            identity_def["type"] = "SystemAssigned, UserAssigned"
+        elif assign_system_identity:
+            identity_def["type"] = "SystemAssigned"
+        elif assign_user_identities:
+            identity_def["type"] = "UserAssigned"
+
+        if assign_user_identities:
+            identity_def["userAssignedIdentities"] = {}
+            subscription_id = get_subscription_id(self.cmd.cli_ctx)
+
+            for r in assign_user_identities:
+                r = _ensure_identity_resource_id(subscription_id, self.get_argument_resource_group_name(), r)
+                identity_def["userAssignedIdentities"][r] = {}  # pylint: disable=unsupported-assignment-operation
+        self.session_pool_def["identity"] = identity_def
 
     def set_up_dynamic_configuration(self):
         dynamic_pool_def = {}
@@ -239,16 +307,22 @@ class SessionPoolCreateDecorator(SessionPoolPreviewDecorator):
         registry_def = None
         if self.get_argument_registry_server() is not None:
             registry_def = {}
-            registry_def["registryServer"] = self.get_argument_registry_server()
-            registry_def["username"] = self.get_argument_registry_user()
+            registry_def["server"] = self.get_argument_registry_server()
 
-            if secrets_def is None:
-                secrets_def = []
-            registry_def["passwordSecretRef"] = store_as_secret_and_return_secret_ref(secrets_def,
-                                                                                      self.get_argument_registry_user(),
-                                                                                      self.get_argument_registry_server(),
-                                                                                      self.get_argument_registry_pass())
-        return registry_def
+            if self.get_argument_registry_user():
+                registry_def["username"] = self.get_argument_registry_user()
+
+                if secrets_def is None:
+                    secrets_def = []
+                registry_def["passwordSecretRef"] = store_as_secret_and_return_secret_ref(secrets_def,
+                                                                                          self.get_argument_registry_user(),
+                                                                                          self.get_argument_registry_server(),
+                                                                                          self.get_argument_registry_pass())
+
+            if self.get_argument_registry_identity():
+                registry_def["identity"] = self.get_argument_registry_identity()
+
+        return registry_def, secrets_def
 
     def set_up_ingress(self):
         if self.get_argument_target_port() is None:
@@ -263,8 +337,7 @@ class SessionPoolCreateDecorator(SessionPoolPreviewDecorator):
         managed_env_name = parsed_managed_env['name']
         managed_env_rg = parsed_managed_env['resource_group']
         try:
-            managed_env_info = self.get_environment_client().show(cmd=self.cmd, resource_group_name=managed_env_rg,
-                                                                  name=managed_env_name)
+            self.get_environment_client().show(cmd=self.cmd, resource_group_name=managed_env_rg, name=managed_env_name)
         except Exception as e:
             handle_non_404_status_code_exception(e)
 
@@ -302,8 +375,8 @@ class SessionPoolCreateDecorator(SessionPoolPreviewDecorator):
                     if error_code == "RoleAssignmentExists":
                         pass
                 else:
-                    raise Exception(e)
-            except:
+                    raise Exception(e)  # pylint: disable=broad-exception-raised
+            except:  # pylint: disable=bare-except
                 logger.warning("Could not add user as session pool creator role to the session pool, please follow the docs https://learn.microsoft.com/en-us/azure/container-apps/sessions-code-interpreter?tabs=azure-cli#authentication to add the needed roll for authentication")
                 logger.warning(e)
 
@@ -415,17 +488,31 @@ class SessionPoolUpdateDecorator(SessionPoolPreviewDecorator):
 
     def set_up_registry_auth_configuration(self, secrets_def, customer_container_template):
         if self.get_argument_registry_server() is not None:
-            safe_set(customer_container_template, "registryCredentials", "registryServer", value=self.get_argument_registry_server())
+            safe_set(customer_container_template, "registryCredentials", "server", value=self.get_argument_registry_server())
         if self.get_argument_registry_user() is not None:
             safe_set(customer_container_template, "registryCredentials", "username", value=self.get_argument_registry_user())
         if secrets_def is None:
             secrets_def = []
         if self.get_argument_registry_pass() is not None:
+            original_secrets = self.existing_pool_def["properties"]["secrets"]
+            original_secrets_names = []
+            for secret in original_secrets:
+                original_secrets_names.append(secret["name"])
             safe_set(customer_container_template, "registryCredentials", "passwordSecretRef",
                      value=store_as_secret_and_return_secret_ref(secrets_def,
-                                                                 self.get_argument_registry_user(),
-                                                                 self.get_argument_registry_server(),
+                                                                 customer_container_template["registryCredentials"]["username"],
+                                                                 customer_container_template["registryCredentials"]["server"],
                                                                  self.get_argument_registry_pass()))
+            new_secret_names = []
+            for secret in secrets_def:
+                new_secret_names.append(secret["name"])
+            deleted_secrets = set(original_secrets_names).difference(new_secret_names)
+            if len(deleted_secrets) > 0:
+                logger.warning("the following secrets are going to be deleted: " + str(deleted_secrets) + " If this is not the intended behavior, please add the missing secrets into the --secrets flag.")  # pylint: disable=logging-not-lazy
+
+            # Update the secrets to the patch payload.
+            if len(secrets_def) > 0:
+                safe_set(self.session_pool_def, "properties", "secrets", value=secrets_def)
 
     def set_up_ingress(self, customer_container_template):
         if self.get_argument_target_port() is not None:

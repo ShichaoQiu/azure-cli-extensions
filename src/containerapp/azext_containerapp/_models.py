@@ -29,7 +29,8 @@ ManagedEnvironment = {
 CustomDomainConfiguration = {
     "dnsSuffix": None,
     "certificateValue": None,
-    "certificatePassword": None
+    "certificatePassword": None,
+    "certificateKeyVaultProperties": None
 }
 
 AppLogsConfiguration = {
@@ -292,6 +293,19 @@ ContainerAppsJob = {
     "tags": None
 }
 
+MaintenanceConfiguration = {
+    "name": "default",
+    "properties": {
+        "scheduledEntries": [
+            {
+                "weekDay": None,
+                "startHourUtc": None,
+                "durationHours": None
+            }
+        ]
+    }
+}
+
 SessionPool = {
     "location": None,
     "properties": {
@@ -306,14 +320,11 @@ SessionPool = {
     }
 }
 
-SessionCodeInterpreterPythonExecution = {
-    "properties": {
-        "identifier": None,
-        "codeInputType": None,
-        "executionType": None,
-        "code": None,
-        "timeoutInSeconds": None
-    }
+SessionCodeInterpreterExecution = {
+    "codeInputType": None,
+    "executionType": None,
+    "code": None,
+    "timeoutInSeconds": None
 }
 
 DaprComponentResiliency = {
@@ -594,23 +605,11 @@ MetricsConfiguration = {
     "destinations": []
 }
 
-ManagedServiceIdentity = {
-    "type": None,  # 'None', 'SystemAssigned', 'UserAssigned', 'SystemAssigned,UserAssigned'
-    "userAssignedIdentities": None  # {string: UserAssignedIdentity}
-}
-
 JavaComponent = {
     "properties": {
         "componentType": None,
         "serviceBinds": None
     }
-}
-
-CustomDomainConfiguration = {
-    "dnsSuffix": None,
-    "certificateValue": None,
-    "certificatePassword": None,
-    "certificateKeyVaultProperties": None
 }
 
 RuntimeJava = {
